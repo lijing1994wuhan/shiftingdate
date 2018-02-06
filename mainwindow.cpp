@@ -1,5 +1,5 @@
 /*Author:Jing Li
- * realize the openFileSlot();newFileSlot();AddaWeek();AddaDay() functions.
+ * realize the openFileSlot();newFileSlot();AddaWeek();AddaDay() functions.link this functions and buttons
 
  *Author:Yang Bai
 
@@ -8,7 +8,8 @@
 */
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include<QPushButton>
+#include "holiday.h"
+
 
 MainWindow::MainWindow(createassignmentcontroller *controller,QWidget *parent) :
     QMainWindow(parent),
@@ -21,13 +22,7 @@ MainWindow::MainWindow(createassignmentcontroller *controller,QWidget *parent) :
     ui->setupUi(this);
 
     setupConnections();
-    /*
-     * Finally, we can also alter the create UI items a bit, e.g. by setting some custom shortcuts
-     * for menu items.
-     *
-     * Note: Setting shortcuts can also be done in the designer, but sometimes it makes sense
-     * to set stuff in C++ instead.
-     */
+
     ui->actionAdd->setShortcut( QKeySequence::New );
     ui->actionEdit->setShortcut( tr( "Ctrl+E" ) );
     ui->actionRemove->setShortcut( QKeySequence::Delete );
@@ -129,18 +124,21 @@ void MainWindow::newFileSlot()
     }
     else
     {
-       //qDebug()<<"not modified";
+
         ui->textEdit->clear();
-       this->setWindowTitle("time.txt");
+       this->setWindowTitle("new.txt");
     }
 
 }
 
 void MainWindow::openFileSlot()
 {
+    /*
+     * read a txt file.
+     */
 
   QString fileName=QFileDialog::getOpenFileName(this,"Open File",QDir::currentPath());
-  //qDebug()<<"fileName is"<<fileName;
+
   if(fileName.isEmpty())
   {
       QMessageBox::information(this,"error" ,"please select a text file");
@@ -152,7 +150,7 @@ void MainWindow::openFileSlot()
   if(ok)
   {
      QTextStream in(file);
-     ui->textEdit->setText(in.readAll());
+     ui->textEdit->setText(in.readAll());//read all messages
      file->close();
      delete file;
   }
@@ -164,41 +162,76 @@ void MainWindow::openFileSlot()
   }
 }
 void MainWindow:: AddaWeek()
-{
-   QDate datetimes = ui->expirationdateEdit->date();
-    datetimes =datetimes.addDays(7);
-     int x =datetimes.dayOfWeek();
-            if(x==6||x==7)
-            {
-
-           QMessageBox a;
-         a.setText("it is weekend,no class!");
-         a.exec();
-
-                     return;
-            }
-         else
-     ui->expirationdateEdit->setDate(datetimes);
-}
-void MainWindow:: AddaDay()
 {/*
-when button is pressed ,judge if it is weekend first.
+when button is pressed ,judge if it is holiday first.
   */
    QDate datetimes = ui->expirationdateEdit->date();
-        datetimes =datetimes.addDays(1);
-        int x =datetimes.dayOfWeek();
-               if(x==6||x==7)
-               {
+    datetimes =datetimes.addDays(7);
+    Holiday x(datetimes);
+    QString y=x.festival();
+    if(y=="")
+     ui->expirationdateEdit->setDate(datetimes);
+    else
+    {
+        QMessageBox a;
+        a.setText(y);
+        a.exec();
+        return;
+    }
 
-              QMessageBox a;
-            a.setText("it is weekend,no class!");
-            a.exec();
-
-                        return;
-               }
-            else
-         ui->expirationdateEdit->setDate(datetimes);
 }
+void MainWindow:: AddaDay()
+{
+   QDate datetimes = ui->expirationdateEdit->date();
+        datetimes =datetimes.addDays(1);
+        Holiday x(datetimes);
+        QString y=x.festival();
+        if(y=="")
+         ui->expirationdateEdit->setDate(datetimes);
+        else
+        {
+            QMessageBox a;
+            a.setText(y);
+            a.exec();
+            return;
+        }
+
+}
+void MainWindow:: MinusaWeek()
+{
+   QDate datetimes = ui->expirationdateEdit->date();
+    datetimes =datetimes.addDays(-7);
+    Holiday x(datetimes);
+    QString y=x.festival();
+    if(y=="")
+     ui->expirationdateEdit->setDate(datetimes);
+    else
+    {
+        QMessageBox a;
+        a.setText(y);
+        a.exec();
+        return;
+    }
+
+}
+void MainWindow:: MinusaDay()
+{
+   QDate datetimes = ui->expirationdateEdit->date();
+        datetimes =datetimes.addDays(-1);
+        Holiday x(datetimes);
+        QString y=x.festival();
+        if(y=="")
+         ui->expirationdateEdit->setDate(datetimes);
+        else
+        {
+            QMessageBox a;
+            a.setText(y);
+            a.exec();
+            return;
+        }
+
+}
+
 void MainWindow::setupConnections()
 {/*
      * This connects various signals in the UI to slots we defined accordingly.
@@ -221,5 +254,9 @@ void MainWindow::setupConnections()
            this,&MainWindow::AddaWeek);
    connect(ui->Button2,&QPushButton::clicked,
            this,&MainWindow::AddaDay);
+   connect(ui->Button3,&QPushButton::clicked,
+           this,&MainWindow::MinusaWeek);
+   connect(ui->Button4,&QPushButton::clicked,
+           this,&MainWindow::MinusaDay);
 
 }

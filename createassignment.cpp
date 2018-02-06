@@ -1,11 +1,10 @@
-/*Author:Yang Bai,Jing Li
+/*Author:Yang Bai
  Source file of class "createassignment",
  if an entry is created, send back the "createassignmententry" object,
    which includes name,theme,expirationdate and assignemnt.
    And send back entryAdded signal.
 
  If an entry is deleted, delete the entry and send back entryRemoved signal.
-
 
 
 */
